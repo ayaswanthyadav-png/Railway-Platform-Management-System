@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- meta charset sets the character set -->
+  <meta charset="UTF-8">
+  <!-- meta viewport is used for mobile browsers -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- meta description is used for SEO -->
+  <meta name="description" content="Railway Platform Management System - platform simulator for assigning trains to platforms.">
+  <title>Railway Platform Management System</title>
+
+  <!-- internal css is written inside the style tag -->
+  <style>
+    /* ---------- page ---------- */
+    body {font-family: Arial, sans-serif;background-color: #eef3f8;color: #1c2b3a;margin: 0;line-height: 1.6;}
+    html {scroll-behavior: smooth;}
+
+    /* ---------- header ---------- */
+    header {background-color: #0b2545;color: white;text-align: center;padding: 40px 20px;border-bottom: 6px solid #f4b400;}
+    h1 {font-size: 38px;margin: 0 0 8px 0;color: white;}
+    header p {color: #cfe0f5;font-size: 18px;margin: 0;}
+
+    /* ---------- navigation ---------- */
+    nav {background-color: #13315c;text-align: center;padding: 14px;position: sticky;top: 0;}
+    a {color: #0b6bcb;text-decoration: none;}
+    a.navlink {color: white;font-weight: bold;padding: 8px 14px;border-radius: 20px;}
+    a.navlink:hover {background-color: #f4b400;color: #0b2545;}
+
+    /* ---------- main content ---------- */
+    main {max-width: 1000px;margin: 0 auto;padding: 20px;}
+    section {background-color: white;padding: 25px 30px;margin: 25px 0;border-radius: 12px;box-shadow: 0 3px 10px rgba(0,0,0,0.12);border-left: 8px solid #13315c;}
+    h2 {color: #13315c;border-bottom: 2px solid #f4b400;padding-bottom: 6px;margin-top: 0;}
+    h3 {color: #b3261e;}
+    blockquote {background-color: #fff8e1;border-left: 5px solid #f4b400;margin: 15px 0;padding: 5px 20px;font-style: italic;}
+    mark {background-color: #ffe082;padding: 2px 6px;border-radius: 4px;}
+    pre {background-color: #0b2545;color: #8fffb0;padding: 15px;border-radius: 8px;font-size: 15px;}
+    ol {padding-left: 30px;}
+    li {margin-bottom: 6px;}
+    dt {font-weight: bold;color: #13315c;margin-top: 10px;}
+    dd {margin-left: 25px;color: #3b4a5a;}
+    hr {border: 1px solid #d5dde8;}
+    figure {text-align: center;margin: 0;}
+    figcaption {color: #55657a;font-size: 14px;margin-top: 8px;}
+    aside {background-color: cornsilk;padding: 15px 30px;border-radius: 12px;border-left: 8px solid #f4b400;margin: 25px 0;}
+
+    /* ---------- tables ---------- */
+    table {border-collapse: collapse;width: 100%;background-color: white;margin: 10px 0;}
+    caption {font-weight: bold;font-size: 18px;color: #13315c;padding: 8px;}
+    th {background-color: #13315c;color: white;padding: 10px;border: 1px solid #0b2545;}
+    td {padding: 10px;border: 1px solid #c9d5e3;text-align: center;}
+    td.ok {color: #1b7f3b;font-weight: bold;}
+    td.bad {color: #b3261e;font-weight: bold;}
+    p.ok {color: #1b7f3b;font-size: 20px;}
+
+    /* ---------- form ---------- */
+    fieldset {border: 2px solid #13315c;border-radius: 10px;margin-bottom: 18px;padding: 15px 20px;background-color: #f7faff;}
+    legend {background-color: #13315c;color: white;padding: 4px 14px;border-radius: 14px;font-weight: bold;}
+    label {font-weight: bold;}
+    input[type='text'] {color: #0b6bcb;padding: 7px;border: 1px solid #9db3cc;border-radius: 6px;width: 220px;}
+    input[type='number'] {color: #0b6bcb;padding: 7px;border: 1px solid #9db3cc;border-radius: 6px;}
+    input[type='date'] {padding: 7px;border: 1px solid #9db3cc;border-radius: 6px;}
+    select {padding: 7px;border-radius: 6px;border: 1px solid #9db3cc;}
+    textarea {border: 1px solid #9db3cc;border-radius: 6px;padding: 8px;}
+    button {background-color: #f4b400;color: #0b2545;font-weight: bold;padding: 10px 22px;border: none;border-radius: 25px;cursor: pointer;font-size: 15px;}
+    button:hover {background-color: #0b2545;color: white;}
+    input[type='button'] {background-color: #b3261e;color: white;padding: 10px 22px;border: none;border-radius: 25px;cursor: pointer;font-size: 15px;}
+
+    /* ---------- station display board ---------- */
+    h2.board {background-color: black;color: chartreuse;text-align: center;letter-spacing: 4px;padding: 14px;border-radius: 8px 8px 0 0;border-bottom: none;margin-bottom: 0;}
+    #board {background-color: black;color: #ffd600;font-family: monospace;font-size: 17px;}
+    #board th {background-color: #1a1a1a;color: chartreuse;border: 1px solid #333;}
+    #board td {border: 1px solid #333;}
+
+    /* ---------- footer ---------- */
+    footer {background-color: #0b2545;color: #cfe0f5;text-align: center;padding: 20px;border-top: 6px solid #f4b400;margin-top: 30px;}
+    footer a {color: #f4b400;}
+  </style>
+</head>
+<body>
+
+  <!-- header tag is used for the title of the page -->
+  <header>
+    <h1>Railway Platform Management System</h1>
+    <p>A platform management simulator for assigning trains to available platforms</p>
+  </header>
+
+  <!-- nav tag holds the links, each link jumps to a section id on this page -->
+  <nav>
+    <a class="navlink" href="#home">Home</a>
+    <a class="navlink" href="#schedule">Train Schedule</a>
+    <a class="navlink" href="#platforms">Platform Availability</a>
+    <a class="navlink" href="#assign">Platform Assignment</a>
+    <a class="navlink" href="#conflicts">Conflict Detection</a>
+    <a class="navlink" href="#display">Station Display</a>
+  </nav>
+
+  <!-- main tag holds the main content of the page -->
+  <main>
+
+    <!-- ================= HOME ================= -->
+    <section id="home">
+      <h2>Problem Statement</h2>
+      <!-- blockquote is used for a long quotation -->
+      <blockquote cite="https://www.w3.org/">
+        <p>Railway stations handle multiple trains arriving and departing from limited platforms. Incorrect or conflicting platform assignments can cause operational confusion for passengers.</p>
+      </blockquote>
+      <!-- hr tag is used to create a horizontal line -->
+      <hr />
+      <h2>Project Task</h2>
+      <!-- mark tag is used to highlight the text -->
+      <p>Create a <mark>platform management simulator</mark> for assigning trains to available platforms.</p>
+
+      <h3>Modules of the Project</h3>
+      <!-- ol tag is used for an ordered list -->
+      <ol type="1" start="1">
+        <li><a href="#schedule">Train schedule</a></li>
+        <li><a href="#platforms">Platform availability</a></li>
+        <li><a href="#assign">Arrival / departure and platform assignment</a></li>
+        <li><a href="#conflicts">Conflict detection</a></li>
+        <li><a href="#display">Station display</a></li>
+      </ol>
+
+      <h3>Key Terms</h3>
+      <!-- dl, dt, dd tags are used for a description list -->
+      <dl>
+        <dt>Platform</dt>
+        <dd>A raised area beside the track where passengers board or leave a train.</dd>
+        <dt>Assignment</dt>
+        <dd>Allotting one train to one platform from its arrival to its departure time.</dd>
+        <dt>Conflict</dt>
+        <dd>Two trains allotted to the same platform at overlapping times.</dd>
+      </dl>
+      <!-- abbr is used for an abbreviation, strong for important text, em for italic -->
+      <p>The <abbr title="Platform">PF</abbr> number is shown on the <strong>station display</strong>. <em>Always check the platform</em> before boarding.</p>
+
+      <!-- figure and figcaption are used for a picture with a caption -->
+      <figure>
+        <!-- svg tag is used to draw shapes, the origin (0,0) is at the top-left corner -->
+        <svg viewBox="0 0 400 150" width="400" height="150">
+          <rect x="10" y="10" width="380" height="26" fill="#007ACC" />
+          <rect x="10" y="46" width="380" height="26" fill="#FF5733" />
+          <rect x="10" y="82" width="380" height="26" fill="#2E8B57" />
+          <rect x="10" y="118" width="380" height="22" fill="#777777" />
+          <circle cx="30" cy="23" r="8" fill="white" />
+          <circle cx="30" cy="59" r="8" fill="white" />
+          <circle cx="30" cy="95" r="8" fill="white" />
+          <circle cx="30" cy="129" r="7" fill="white" />
+        </svg>
+        <figcaption>Figure 1: Platforms 1 to 4 of the station</figcaption>
+      </figure>
+    </section>
+
+    <!-- ================= SCHEDULE ================= -->
+    <section id="schedule">
+      <h2>Train Schedule</h2>
+      <!-- table tag is used to show data in rows and columns -->
+      <table border="2" cellpadding="8">
+        <!-- caption is the title of the table -->
+        <caption>Trains of the Day (Morning)</caption>
+        <!-- thead is the heading part, th is bold and centered -->
+        <thead>
+          <tr>
+            <th>Sr.No</th>
+            <th>Train No</th>
+            <th>Train Name</th>
+            <th>Arrival</th>
+            <th>Departure</th>
+            <th>Platform Requested</th>
+          </tr>
+        </thead>
+        <!-- tbody is the body part, tr is a row, td is a cell -->
+        <tbody>
+          <tr><td>1</td><td>12001</td><td>Shatabdi Express</td><td>06:00</td><td>06:20</td><td>PF 1</td></tr>
+          <tr><td>2</td><td>12002</td><td>Intercity Express</td><td>06:10</td><td>06:30</td><td>PF 2</td></tr>
+          <tr><td>3</td><td>12003</td><td>Local Passenger</td><td>06:15</td><td>06:40</td><td>PF 1</td></tr>
+          <tr><td>4</td><td>12004</td><td>Mail Express</td><td>06:35</td><td>07:00</td><td>PF 3</td></tr>
+          <tr><td>5</td><td>12005</td><td>Superfast Express</td><td>06:50</td><td>07:15</td><td>PF 2</td></tr>
+          <tr><td>6</td><td>12006</td><td>Garib Rath</td><td>07:10</td><td>07:30</td><td>PF 1</td></tr>
+        </tbody>
+        <!-- tfoot is the footer part, colspan joins columns -->
+        <tfoot>
+          <tr><td colspan="6"><b>Total Trains: 6</b></td></tr>
+        </tfoot>
+      </table>
+      <!-- small tag is used for small text -->
+      <p><small>Times are in 24-hour format.</small></p>
+    </section>
+
+    <!-- ================= PLATFORM AVAILABILITY ================= -->
+    <section id="platforms">
+      <h2>Platform Availability</h2>
+      <!-- rowspan joins rows and colspan joins columns -->
+      <table border="2" cellpadding="8">
+        <caption>Platform Occupancy (after assignment)</caption>
+        <tr>
+          <th rowspan="2">Platform</th>
+          <th colspan="3">Trains Using the Platform</th>
+          <th rowspan="2">Status</th>
+        </tr>
+        <tr>
+          <th>Slot 1</th>
+          <th>Slot 2</th>
+          <th>Slot 3</th>
+        </tr>
+        <tr>
+          <td>PF 1</td>
+          <td>12001 (06:00-06:20)</td>
+          <td>12004 (06:35-07:00)</td>
+          <td>12006 (07:10-07:30)</td>
+          <td class="bad">Busy</td>
+        </tr>
+        <tr>
+          <td>PF 2</td>
+          <td>12002 (06:10-06:30)</td>
+          <td>12005 (06:50-07:15)</td>
+          <td>Free</td>
+          <td class="ok">Available</td>
+        </tr>
+        <tr>
+          <td>PF 3</td>
+          <td>12003 (06:15-06:40)</td>
+          <td>Free</td>
+          <td>Free</td>
+          <td class="ok">Available</td>
+        </tr>
+        <tr>
+          <td>PF 4</td>
+          <td colspan="3"><center>No train assigned - reserved for emergency use</center></td>
+          <td class="ok">Available</td>
+        </tr>
+      </table>
+      <!-- ul tag is used for an unordered list -->
+      <ul>
+        <li><strong>Busy</strong> - every slot is occupied.</li>
+        <li><strong>Available</strong> - at least one slot is free.</li>
+      </ul>
+    </section>
+
+    <!-- ================= PLATFORM ASSIGNMENT ================= -->
+    <section id="assign">
+      <h2>Platform Assignment</h2>
+      <!-- form tag is used to take input from the user -->
+      <form>
+        <!-- fieldset is used to group related form elements, legend is its title -->
+        <fieldset>
+          <legend>Train Information</legend>
+          <!-- label is linked to the input by matching for and id -->
+          <label for="trainno">Train No:</label>
+          <input type="number" id="trainno" name="trainno"><br><br>
+          <label for="trainname">Train Name:</label>
+          <!-- placeholder shows a hint inside the box -->
+          <input type="text" id="trainname" name="trainname" placeholder="Enter train name"><br><br>
+          <label for="arrival">Arrival (HH:MM):</label>
+          <input type="text" id="arrival" name="arrival" placeholder="06:00"><br><br>
+          <label for="departure">Departure (HH:MM):</label>
+          <input type="text" id="departure" name="departure" placeholder="06:20"><br><br>
+          <label for="traindate">Date:</label>
+          <input type="date" id="traindate" name="traindate">
+        </fieldset>
+
+        <fieldset>
+          <legend>Platform Information</legend>
+          <label for="platform">Platform:</label>
+          <!-- select and option are used for a drop-down list -->
+          <select name="platform" id="platform">
+            <option value="pf1">Platform 1</option>
+            <option value="pf2">Platform 2</option>
+            <option value="pf3">Platform 3</option>
+            <option value="pf4">Platform 4</option>
+          </select><br><br>
+          <p>Train Type:</p>
+          <!-- radio buttons with the same name allow only one choice -->
+          <input type="radio" id="express" name="traintype" value="express" checked>
+          <label for="express">Express</label>
+          <input type="radio" id="passenger" name="traintype" value="passenger">
+          <label for="passenger">Passenger</label><br><br>
+          <!-- checkbox allows many choices -->
+          <input type="checkbox" id="priority" name="priority" value="priority">
+          <label for="priority">Give priority to this train</label><br><br>
+          <label for="remarks">Remarks:</label><br>
+          <!-- textarea is used for a long text -->
+          <textarea name="remarks" id="remarks" rows="4" cols="50" placeholder="Enter remarks here"></textarea><br><br>
+        </fieldset>
+
+        <!-- button with onclick shows an alert message -->
+        <button type="submit" onclick="alert('Platform assigned successfully! No conflict found.')">Assign Platform</button>
+        <input type="button" value="Reset">
+      </form>
+
+      <h3>Final Assignment List</h3>
+      <table border="2" cellpadding="8">
+        <thead>
+          <tr><th>Train No</th><th>Train Name</th><th>Arrival</th><th>Departure</th><th>Platform Assigned</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>12001</td><td>Shatabdi Express</td><td>06:00</td><td>06:20</td><td>PF 1</td></tr>
+          <tr><td>12002</td><td>Intercity Express</td><td>06:10</td><td>06:30</td><td>PF 2</td></tr>
+          <tr><td>12003</td><td>Local Passenger</td><td>06:15</td><td>06:40</td><td class="bad">PF 3 (changed from PF 1)</td></tr>
+          <tr><td>12004</td><td>Mail Express</td><td>06:35</td><td>07:00</td><td class="bad">PF 1 (changed from PF 3)</td></tr>
+          <tr><td>12005</td><td>Superfast Express</td><td>06:50</td><td>07:15</td><td>PF 2</td></tr>
+          <tr><td>12006</td><td>Garib Rath</td><td>07:10</td><td>07:30</td><td>PF 1</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ================= CONFLICT DETECTION ================= -->
+    <section id="conflicts">
+      <h2>Conflict Detection</h2>
+      <p>Two trains conflict when they are given the <strong>same platform</strong> and the arrival of one train comes <em>before</em> the departure of the other.</p>
+      <!-- pre tag is used to display the text as it is written -->
+      <pre>
+Conflict if:  arrival(B) &lt; departure(A)
+              and platform(A) = platform(B)
+      </pre>
+
+      <table border="2" cellpadding="8">
+        <caption>Conflicts Found in the Requested Schedule</caption>
+        <thead>
+          <tr><th>No</th><th>Train A</th><th>Train B</th><th>Platform</th><th>Overlap</th><th>Action Taken</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>12001 (06:00-06:20)</td>
+            <td>12003 (06:15-06:40)</td>
+            <td>PF 1</td>
+            <td><mark>06:15 to 06:20</mark></td>
+            <td>12003 moved to PF 3</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>12003 (06:15-06:40)</td>
+            <td>12004 (06:35-07:00)</td>
+            <td>PF 3</td>
+            <td><mark>06:35 to 06:40</mark></td>
+            <td>12004 moved to PF 1</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="6"><b>Total Conflicts: 2 - all resolved</b></td></tr>
+        </tfoot>
+      </table>
+
+      <p class="ok"><strong>No conflicts remain in the final assignment.</strong></p>
+      <button type="button" onclick="alert('Conflict check complete: 2 conflicts found and resolved.')">Run Conflict Check</button>
+    </section>
+
+    <!-- ================= STATION DISPLAY ================= -->
+    <section id="display">
+      <!-- class selector and id selector are used for the display board -->
+      <h2 class="board">ARRIVALS AND DEPARTURES</h2>
+      <table id="board" border="4" cellpadding="8">
+        <thead>
+          <tr><th>Train No</th><th>Train Name</th><th>Arrival</th><th>Departure</th><th>Platform</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>12001</td><td>Shatabdi Express</td><td>06:00</td><td>06:20</td><td>1</td><td>On Time</td></tr>
+          <tr><td>12002</td><td>Intercity Express</td><td>06:10</td><td>06:30</td><td>2</td><td>On Time</td></tr>
+          <tr><td>12003</td><td>Local Passenger</td><td>06:15</td><td>06:40</td><td>3</td><td>Platform Changed</td></tr>
+          <tr><td>12004</td><td>Mail Express</td><td>06:35</td><td>07:00</td><td>1</td><td>Platform Changed</td></tr>
+          <tr><td>12005</td><td>Superfast Express</td><td>06:50</td><td>07:15</td><td>2</td><td>On Time</td></tr>
+          <tr><td>12006</td><td>Garib Rath</td><td>07:10</td><td>07:30</td><td>1</td><td>On Time</td></tr>
+        </tbody>
+      </table>
+      <p><small>Passengers are requested to check the platform number before boarding.</small></p>
+    </section>
+
+    <!-- aside tag is used for related links -->
+    <aside>
+      <h2>Related Links</h2>
+      <ul>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element" target="_blank">MDN: HTML Elements Reference</a></li>
+        <li><a href="https://html.spec.whatwg.org/multipage/" target="_blank">HTML Living Standard</a></li>
+      </ul>
+    </aside>
+
+  </main>
+
+  <!-- footer tag is used for the copyright and contact details -->
+  <footer>
+    <p>&copy; 2026 Railway Platform Management System. All rights reserved.</p>
+    <p>Contact: <a href="mailto:admin@university.edu">admin@university.edu</a></p>
+  </footer>
+
+</body>
+</html>
